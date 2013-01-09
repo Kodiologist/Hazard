@@ -1,0 +1,547 @@
+#!/usr/bin/env python
+from psychopy import *
+import os
+import datetime
+import random
+import math
+import pickle
+import numpy
+
+def log(f, t):
+    f.write('time:\t'+str(t['time']))
+    f.write('\t')
+    f.write('trial:\t' +str(t['trial']))
+    f.write('\t')
+    f.write('trial type:\t' +str(t['type']))
+    f.write('\t')
+    f.write('certainty:\t'+str(t['certainty']))
+    f.write('\t')
+    f.write('riskmagnitude:\t'+str(t['riskmagnitude']))
+    f.write('\t')
+    f.write('probability:\t'+str(t['probability']))
+    f.write('\t')
+    f.write('sharedloss:\t'+str(t['sharedloss']))
+    f.write('\t')
+    f.write('matchedEVW:\t'+str(t['matchedEVW']))
+    f.write('\t')
+    f.write('matchedEVL:\t'+str(t['matchedEVL']))
+    f.write('\t')
+    f.write('rt:\t'+str(t['rt']))
+    f.write('\t')
+    f.write('choice:\t'+str(t['choice']))
+    f.write('\t')
+    f.write('outcome:\t'+str(t['outcome']))
+    f.write('\t')
+    f.write('ttlrew:\t'+str(t['ttlrew']))
+    f.write('\n')
+    f.flush()
+
+
+def drawtrial():
+    message.setPos([0,.85])
+    message.setText('Which would you prefer?')
+    message.draw()
+    
+    if sides:
+        if trial['type'] == 'sharedlosslocal':
+            message.setPos(rewPos[0])
+            message.setText('100% Win ' +'$' + str(certainty))
+            message.draw()
+    
+            per = int(trial['probability']*100)
+            per2 = 100 - per
+            message.setPos(rewPos[1])
+            message.setText(str(per)+ '% Win ' + '$' + str(trial['riskmagnitude']))
+            message.draw()
+            message.setPos(riskPos[1])
+            message.setText(str(per2) + '% Lose ' + '$' + str(trial['riskmagnitude']))
+            message.draw()
+            message.setPos(riskpos3[1])
+            message.setText('Shared Loss with \nLocal Partner')
+            message.draw()
+            
+        elif trial['type'] == 'sharedlossDuane':
+            message.setPos(rewPos[0])
+            message.setText('100% Win ' +'$' + str(certainty))
+            message.draw()
+    
+            per = int(trial['probability']*100)
+            per2 = 100 - per
+            message.setPos(rewPos[1])
+            message.setText(str(per)+ '% Win ' + '$' + str(trial['riskmagnitude']))
+            message.draw()
+            message.setPos(riskPos[1])
+            message.setText(str(per2) + '% Lose ' + '$' + str(trial['riskmagnitude']))
+            message.draw()
+            message.setPos(riskpos3[1])
+            message.setText('Shared Loss with \nDuane Lab Partner')
+            message.draw()
+            
+        elif trial['type'] == 'sharedlossAsDuane':
+            message.setPos(rewPos[0])
+            message.setText('100% Win ' +'$' + str(certainty))
+            message.draw()
+    
+            per = int(trial['probability']*100)
+            per2 = 100 - per
+            message.setPos(rewPos[1])
+            message.setText(str(per)+ '% Win ' + '$' + str(trial['riskmagnitude']))
+            message.draw()
+            message.setPos(riskPos[1])
+            message.setText(str(per2) + '% Lose ' + '$' + str(trial['riskmagnitude']))
+            message.draw()
+            message.setPos(riskpos3[1])
+            message.setText('Shared Loss (as Duane Lab \npartner) with Local Partner')
+            message.draw()
+            
+        elif trial['type'] == 'matched':
+            message.setPos(rewPos[0])
+            message.setText('100% Win ' +'$' + str(certainty))
+            message.draw()
+            
+            per = int(trial['probability']*100)
+            per2 = 100 - per
+            EVW = trial['matchedEVW']
+            EVL = EVW/2
+            message.setPos(rewPos[1])
+            message.setText(str(per) + '% Win $'+str(EVW))
+            message.draw()
+            message.setPos(riskPos[1])
+            message.setText(str(per2)+'% Lose $'+str(EVL))
+            message.draw()
+            message.setPos(riskpos3[1])
+            message.setText('Full Personal Loss')
+            message.draw()
+                
+        else:
+            message.setPos(rewPos[0])
+            message.setText('100% Win ' +'$' + str(certainty))
+            message.draw()
+            
+            per = int(trial['probability']*100)
+            per2 = 100 - per
+            message.setPos(rewPos[1])
+            message.setText(str(per)+ '% Win ' + '$' + str(trial['riskmagnitude']))
+            message.draw()
+            message.setPos(riskPos[1])
+            message.setText(str(per2) + '% Lose ' + '$' + str(trial['riskmagnitude']))
+            message.draw()
+            message.setPos(riskpos3[1])
+            message.setText('Full Personal Loss')
+            message.draw()
+                
+    else:
+        if trial['type'] == 'sharedlosslocal':
+            per = int(trial['probability']*100)
+            per2 = 100 - per
+            message.setPos(rewPos[0])
+            message.setText(str(per)+ '% Win ' + '$' + str(trial['riskmagnitude']))
+            message.draw()
+            message.setPos(riskPos[0])
+            message.setText(str(per2) + '% Lose ' + '$' + str(trial['riskmagnitude']))
+            message.draw()
+            message.setPos(riskpos3[0])
+            message.setText('Shared Loss with \nLocal Partner')
+            message.draw()
+
+            message.setPos(rewPos[1])
+            message.setText('100% Win ' +'$' + str(certainty))
+            message.draw()
+            
+        elif trial['type'] == 'sharedlossDuane':
+            per = int(trial['probability']*100)
+            per2 = 100 - per
+            message.setPos(rewPos[0])
+            message.setText(str(per)+ '% Win ' + '$' + str(trial['riskmagnitude']))
+            message.draw()
+            message.setPos(riskPos[0])
+            message.setText(str(per2) + '% Lose ' + '$' + str(trial['riskmagnitude']))
+            message.draw()
+            message.setPos(riskpos3[0])
+            message.setText('Shared Loss with \nDuane Lab Partner')
+            message.draw()
+
+            message.setPos(rewPos[1])
+            message.setText('100% Win ' +'$' + str(certainty))
+            message.draw()
+            
+        elif trial['type'] == 'sharedlossAsDuane':
+            per = int(trial['probability']*100)
+            per2 = 100 - per
+            message.setPos(rewPos[0])
+            message.setText(str(per)+ '% Win ' + '$' + str(trial['riskmagnitude']))
+            message.draw()
+            message.setPos(riskPos[0])
+            message.setText(str(per2) + '% Lose ' + '$' + str(trial['riskmagnitude']))
+            message.draw()
+            message.setPos(riskpos3[0])
+            message.setText('Shared Loss (as Duane Lab \nPartner) with Local Partner')
+            message.draw()
+
+            message.setPos(rewPos[1])
+            message.setText('100% Win ' +'$' + str(certainty))
+            message.draw()
+            
+            
+        elif trial['type'] == 'matched':
+            per = int(trial['probability']*100)
+            per2 = 100 - per
+            EVW = trial['matchedEVW']
+            EVL = EVW/2
+            message.setPos(rewPos[0])
+            message.setText(str(per) + '% Win $'+str(EVW))
+            message.draw()
+            message.setPos(riskPos[0])
+            message.setText(str(per2)+'% Lose $'+str(EVL))
+            message.draw()
+            message.setPos(riskpos3[0])
+            message.setText('Full Personal Loss')
+            message.draw()
+            
+            message.setPos(rewPos[1])
+            message.setText('100% Win ' +'$' + str(certainty))
+            message.draw()
+           
+            
+        else:
+            per = int(trial['probability']*100)
+            per2 = 100 - per
+            message.setPos(rewPos[0])
+            message.setText(str(per)+ '% Win ' + '$' + str(trial['riskmagnitude']))
+            message.draw()
+            message.setPos(riskPos[0])
+            message.setText(str(per2) + '% Lose ' + '$' + str(trial['riskmagnitude']))
+            message.draw()
+            message.setPos(riskpos3[0])
+            message.setText('Full Personal Loss')
+            message.draw()
+
+            message.setPos(rewPos[1])
+            message.setText('100% Win ' +'$' + str(certainty))
+            message.draw()
+
+
+def drawoutcome(r):
+    
+    if trial['choice'] == 0:
+        rew = certainty
+        
+    else:
+        if trial['type'] == 'sharedlosseslocal':
+            if random.random() < trial['probability']:
+                rew = trial['riskmagnitude']
+                
+            else:
+                rew = -trial['riskmagnitude']/2
+                
+        elif trial['type'] == 'sharedlossesDuane':
+            if random.random() < trial['probability']:
+                rew = trial['riskmagnitude']
+                
+            else:
+                rew = -trial['riskmagnitude']/2
+                
+        elif trial['type'] == 'sharedlossesAsDuane':
+            if random.random() < trial['probability']:
+                rew = trial['riskmagnitude']
+                
+            else:
+                rew = -trial['riskmagnitude']/2
+                
+        elif trial['type'] == 'matched':
+            if random.random() < trial['probability']:
+                rew = trial['matchedEVW']
+                
+            else:
+                rew = -trial['matchedEVW']/2
+        
+        else:
+            if random.random() < trial['probability']:
+                rew = trial['riskmagnitude']
+                
+            else:
+                rew = -trial['riskmagnitude']
+                
+    return rew
+
+#--------------------------------------------------INITIALISE DATA STRUCTURE
+
+expData = []
+
+certainty = 15
+riskymagnitudes = [20,30,40,50,60]
+#sharedloss20 = [16,32,48]
+#sharedloss50 = [10,20,30]
+#matchedrisky = [10,20,30,40,60]
+matchedEVW = [20,30,40,50,60]
+probabilities = [.5,.6,.7,.8]
+#percents = [50,60,70,80,90]
+#sharedlosses = [20,50]
+sharedlosses = [50]
+
+
+for riskymagnitude in riskymagnitudes:
+    for probability in probabilities:
+        for hazard in sharedlosses:
+            trial = {}
+            trial['certainty'] = certainty
+            trial['riskmagnitude'] = riskymagnitude
+            trial['probability'] = probability
+            trial['sharedloss'] = hazard
+            trial['matchedEVW'] = -77
+            trial['matchedEVL'] = -77
+            trial['rt'] = -77 
+            trial['choice'] = -77
+            trial['outcome'] = -77
+            trial['ttlrew'] = -77
+            trial['type'] = 'sharedlosslocal'
+            expData.append(trial)
+            
+for riskymagnitude in riskymagnitudes:
+    for probability in probabilities:
+        for hazard in sharedlosses:
+            trial = {}
+            trial['certainty'] = certainty
+            trial['riskmagnitude'] = riskymagnitude
+            trial['probability'] = probability
+            trial['sharedloss'] = hazard
+            trial['matchedEVW'] = -77
+            trial['matchedEVL'] = -77
+            trial['rt'] = -77 
+            trial['choice'] = -77
+            trial['outcome'] = -77
+            trial['ttlrew'] = -77
+            trial['type'] = 'sharedlossDuane'
+            expData.append(trial)
+            
+for riskymagnitude in riskymagnitudes:
+    for probability in probabilities:
+        for hazard in sharedlosses:
+            trial = {}
+            trial['certainty'] = certainty
+            trial['riskmagnitude'] = riskymagnitude
+            trial['probability'] = probability
+            trial['sharedloss'] = hazard
+            trial['matchedEVW'] = -77
+            trial['matchedEVL'] = -77
+            trial['rt'] = -77 
+            trial['choice'] = -77
+            trial['outcome'] = -77
+            trial['ttlrew'] = -77
+            trial['type'] = 'sharedlossAsDuane'
+            expData.append(trial)
+        
+for riskymagnitude in riskymagnitudes:
+    for probability in probabilities:
+        trial = {}
+        trial['certainty'] = certainty
+        trial['riskmagnitude'] = riskymagnitude
+        trial['probability'] = probability
+        trial['sharedloss'] = -77
+        trial['matchedEVW'] = -77
+        trial['matchedEVL'] = -77
+        trial['rt'] = -77 
+        trial['choice'] = -77
+        trial['outcome'] = -77
+        trial['ttlrew'] = -77
+        trial['type'] = 'standard'
+        expData.append(trial)
+        
+for EVW in matchedEVW:
+    for probability in probabilities:
+        trial = {}
+        trial['certainty'] = certainty
+        trial['riskmagnitude'] = -77
+        trial['probability'] = probability
+        trial['sharedloss'] = -77
+        trial['matchedEVW'] = EVW
+        trial['matchedEVL'] = EVW/2
+        trial['rt'] = -77 
+        trial['choice'] = -77
+        trial['outcome'] = -77
+        trial['ttlrew'] = -77
+        trial['type'] = 'matched'
+        expData.append(trial)
+        
+        
+expData = misc.shuffleArray(expData)
+
+#print(len(expData))
+#for t in expData:
+#    print(t)
+#core.quit()
+
+
+#--------------------------------------------------GET USER INFO
+dlg = gui.Dlg(title="Decision-Making")
+dlg.addText('')
+dlg.addField('Subject Number:', 999)
+dlg.addText('')
+dlg.show()
+
+if dlg.OK:
+    SN = int(dlg.data[0])
+    fileOut = 'moralhazard_' + str(SN)
+    print fileOut
+
+else:
+    print 'user cancelled'
+    core.quit()
+    
+#--------------------------------------------------OUTPUT FILE
+logFile=open(fileOut+'.dlm', 'a')
+logFile.write('\n\nExperiment began at: '+str(datetime.datetime.now()) + '\n\n')
+logFile.flush()
+
+#--------------------------------------------------INITIALISE STIMULI
+
+# create a window to draw in
+res = [1280.,1024.]
+
+win=visual.Window(res,fullscr=1,bitsMode=None, units='norm', winType='pyglet', color=1., colorSpace='rgb')
+
+y = .08
+rewPos = [(-.6, y), (.6, y)]
+w = -.65
+x = -.24
+z = -.08
+riskPos = [(-.6, z), (.6, z)]
+riskPos2 = [(-.6,x),(.6,x)]
+riskpos3 = [(-.6,w),(.6,w)]
+
+ttlrew = 0
+a = 0
+
+#--------------------------------------------------INSTRUCTIONS
+# clear the screen
+win.flip(clearBuffer=True)
+# Wait for any key to begin
+message = visual.TextStim(win,pos=(0.0,0.0), text='Experimenter, press any key to begin.', color=-1., colorSpace='rgb')
+message.draw()
+win.flip()
+
+while not event.getKeys():
+    pass
+win.flip()
+core.wait(5, hogCPUperiod = 5)
+
+#--------------------------------------------------RUN TASK
+timer = core.Clock()
+
+
+# Hide the mouse
+mouse = event.Mouse()
+mouse.setVisible(False)
+
+win.flip()
+message = visual.TextStim(win,pos=(0.0,0.0), text='You have been assigned to be Player A.', color=-1., colorSpace='rgb')
+message.draw()
+win.flip()
+core.wait(5, hogCPUperiod = 5)
+win.flip()
+core.wait(2, hogCPUperiod = 2)
+win.flip()
+
+message = visual.TextStim(win,pos=(0.0,0.0), text='As Player A, there is another type of shared loss trial that you will see. In these trials, your losses would be shared with your local partner (Player B), but your local partner would see the loss as coming from the Duane Lab partner. On these trials, it will say "Shared Loss (as Duane Lab Partner) with Local Partner" underneath the risky reward option. Press the Spacebar when done reading.', color=-1., colorSpace='rgb')
+message.draw()
+win.flip()
+
+event.clearEvents()
+while not event.getKeys():
+    pass
+win.flip()
+core.wait(2, hogCPUperiod = 2)
+win.flip()
+
+
+for trial in expData:
+    
+    trial['time'] = datetime.datetime.now()
+    
+    a += 1
+    trial['trial'] = a
+    
+    win.flip()
+    
+    sides = random.random() > .5
+    
+    drawtrial()
+    
+    win.flip()
+    
+    # wait for a choice
+    event.getKeys()
+    timer.reset()
+    
+    choice = 0
+    rt = 0
+    outcome = 0
+    event.clearEvents()
+    while choice == 0:
+        for key in event.getKeys():
+            if key in ['left', 'right']:
+                rt = timer.getTime()
+                choice = key
+                
+        # log response
+    if sides:
+        if choice == 'right':
+            trial['choice'] = 1
+        else:
+            trial['choice'] = 0
+    else:
+        if choice == 'right':
+            trial['choice'] = 0
+        else:
+            trial['choice'] = 1
+    trial['rt'] = rt
+    
+    win.flip()
+    
+    outcome = drawoutcome(0)
+
+    ttlrew = ttlrew + outcome
+    trial['outcome'] = outcome
+    trial['ttlrew'] = ttlrew
+    
+#    core.wait(2)
+#    win.flip()
+#    core.wait(2)
+    
+# clear the screen
+    win.flip()
+
+#    print(trial)
+    log(logFile, trial)
+    core.wait(2, hogCPUperiod = 2)
+
+# Unhide the mouse
+mouse.setVisible(True)
+
+#--------------------------------------------------LOG RESULTS
+
+# clean up the log file
+logFile.close()
+
+# pickle the data
+f=open(fileOut+'.pkl', 'wb')
+pickle.dump(expData, f)
+
+#--------------------------------------------------FINISH UP
+message = visual.TextStim(win,pos=(0,0), text='Your total earnings: $'+str(ttlrew)+'\n\nYou earned the $5 in real money!', color=[-1,-1,-1] ,colorSpace='rgb')
+message.draw()
+win.flip()
+core.wait(5, hogCPUperiod = 5)
+win.flip()
+message = visual.TextStim(win,pos=(0,0), text='Done with task!\n\nPlease wait for the experimenter.', color=[-1,-1,-1] ,colorSpace='rgb')
+message.draw()
+win.flip()
+core.wait(5, hogCPUperiod = 5)
+while 1:
+    if event.getKeys():
+        break
+
+mouse.setVisible(1)
+win.close()
+core.quit()
+f.close()

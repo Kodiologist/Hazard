@@ -1,11 +1,19 @@
 #!/usr/bin/env python
+# encoding: UTF-8
 from psychopy import *
+import wx
 import os
 import datetime
-import random
-import math
+import random, math, itertools
 import pickle
 import numpy
+import json
+
+def concat(x):
+    return list(itertools.chain.from_iterable(x))
+
+def shuffled(x):
+    return random.sample(x, len(x))
 
 def log(f, t):
     f.write('time:\t'+str(t['time']))
@@ -264,6 +272,20 @@ def drawoutcome(r):
                 
     return rew
 
+person_types = dict(
+    best_friend = "Your best friend",
+    parent = "The parent or stepparent you're closest to",
+    friend_of_friend = "A friend of a friend",
+    childhood_friend = "A childhood friend you haven't spoken to in years",
+    local_partner = "Your local partner",
+    occ_relative = "A relative you see no more than a few times a year",
+    doctor = "Your primary physician",
+    cashier = "A cashier at a store (or a university eatery)\nthat you go to often",
+    remote_partner = "Your Duane Lab partner",
+    unmet_classmate = "A classmate you can recognize but\nyou've never spoken to",
+    dead_relative = "A relative who you know a least a little about but\nwho died before you were born",
+    stranger = "A stranger you've seen once or a few times and\nwho you know nothing about")
+
 #--------------------------------------------------INITIALISE DATA STRUCTURE
 
 expData = []
@@ -518,14 +540,135 @@ for trial in expData:
 # Unhide the mouse
 mouse.setVisible(True)
 
+
+#--------------------------------------------------ADMINISTER MANIPULATION CHECK
+
+def err(text):
+    wx.MessageBox(text, 'Error')
+
+dialog_size = (800, 650)
+nickname_field_width = 200
+
+default_wrap_width = 300
+def wrapped_text(parent, message, wrap_width = default_wrap_width):
+    x = wx.StaticText(parent, label = message)
+    x.Wrap(wrap_width)
+    return x
+
+class NicknameInputDlg(wx.Dialog):
+    def __init__(self, text):
+        wx.Dialog.__init__(self, None,
+            title = 'My Cool Title',
+            size = dialog_size,
+            style = wx.DEFAULT_DIALOG_STYLE & ~wx.CLOSE_BOX)
+
+        p = wx.Panel(self)
+
+        self.person_types = shuffled(person_types.keys())
+        self.labels = []
+        self.fields = []
+        for pt in self.person_types:
+            self.labels.append(wx.StaticText(p, -1, person_types[pt]))
+            self.fields.append(wx.TextCtrl(p, -1, size = (nickname_field_width, -1)))
+
+        space = 5
+
+        sizer = wx.FlexGridSizer(cols = 2, hgap=space, vgap=space)
+        for x in concat(zip(self.labels, self.fields)):
+            sizer.Add(x, flag = wx.ALIGN_CENTRE_VERTICAL)
+        outer = wx.BoxSizer(wx.VERTICAL)
+        outer.Add(wrapped_text(p, text, 650),
+            flag = wx.ALIGN_CENTRE | wx.TOP,
+            border = 10)
+        outer.Add(sizer, 1, wx.ALL | wx.EXPAND, 25)
+        outer.Add(wx.Button(p, wx.ID_OK), flag = wx.ALIGN_CENTRE)
+        p.SetSizerAndFit(outer)
+
+    def get_nicknames(self):
+        return {k: x.GetValue().strip()
+            for k, x in zip(self.person_types, self.fields)}
+
+d = NicknameInputDlg(
+    u"Below is a list of several types of people. Some of these types will include only one person for you, whereas others will include several. For each type, think of a particular person who fits the description. Then, in the blank, write a name we can use to refer to that person for this study. The name could be part of the person's actual name or it could be a short description—whatever is memorable enough that you won't forget what person the name refers to.")
+#nicknames = {'remote_partner': u'duaney', 'unmet_classmate': u'class', 'best_friend': u'bff', 'parent': u'parent', 'doctor': u'doc', 'cashier': u'cashier', 'stranger': u'stranger', 'local_partner': u'thatguy', 'dead_relative': u'rel', 'childhood_friend': u'timmy', 'occ_relative': u'unclejoe', 'friend_of_friend': u'foaf'}
+while True:
+    if d.ShowModal() != wx.ID_OK:
+        continue
+    nicknames = d.get_nicknames()
+    if any(s == "" for s in nicknames.values()):
+        err('Please provide a name for every type of person.')
+    elif len(set(nicknames.values())) != len(nicknames):
+        err('No two names can be identical.')
+    else:
+        d.Destroy()
+        break
+
+class RankingDlg(wx.Dialog):
+    def __init__(self, nicknames, text):
+        wx.Dialog.__init__(self, None,
+            title = 'My Cool Title',
+            size = (default_wrap_width + 25, 600),
+            style = wx.DEFAULT_DIALOG_STYLE & ~wx.CLOSE_BOX)
+
+        p = wx.Panel(self)
+
+        self.nicknames = nicknames
+        self.initial_nickname_order = shuffled(nicknames.values())
+
+        self.lb = wx.ListBox(p,
+            #size = (200, 500),
+            choices = self.initial_nickname_order)
+        self.lb.Bind(wx.EVT_KEY_DOWN, self.OnKeyDown, self.lb)
+
+        sz = wx.BoxSizer(wx.VERTICAL)
+        sz.Add((0, 10))
+        sz.Add(wrapped_text(p, text), flag = wx.ALIGN_CENTRE)
+        sz.Add(self.lb, 1, flag = wx.EXPAND | wx.ALL, border = 10)
+        sz.Add(wx.Button(p, wx.ID_OK), 0, flag = wx.ALIGN_CENTRE)
+        p.SetSizer(sz)
+
+    def OnKeyDown(self, event):
+        keycode = event.GetKeyCode()
+        if keycode == wx.WXK_UP:
+            incr = -1
+        elif keycode == wx.WXK_DOWN:
+            incr = 1
+        else:
+            event.Skip()
+            return
+        # Move the selected item up or down the list.
+        lb = event.GetEventObject()
+        i = lb.GetSelection()
+        if i + incr in (-1, lb.GetCount()):
+          # The user is trying to go past the end of the list.
+            return
+        strs = lb.GetStrings()
+        lb.Delete(i + incr)
+        lb.Insert(strs[i + incr], i)
+
+    def get_ranking(self):
+        rnicknames = {v: k for k, v in self.nicknames.items()}
+        return [rnicknames[k] for k in self.lb.GetStrings()]
+
+d = RankingDlg(nicknames,
+    "Now sort these people according to how close you feel to them. Put the person to whom you feel closest at the top and the person from whom you feel most distant at the bottom. Click on a name to select it, then use the arrow keys to move it up and down the list.")
+while True:
+    if d.ShowModal() == wx.ID_OK:
+        break
+distance_ranking = d.get_ranking()
+d.Destroy()
+
+print >>logFile, json.dumps(dict(nicknames = nicknames, distance_ranking = distance_ranking))
+
 #--------------------------------------------------LOG RESULTS
 
 # clean up the log file
 logFile.close()
 
 # pickle the data
-f=open(fileOut+'.pkl', 'wb')
-pickle.dump(expData, f)
+with open(fileOut+'.pkl', 'wb') as f:
+    pickle.dump(dict(expData = expData, nicknames = nicknames, distance_ranking = distance_ranking),
+        f)
 
 #--------------------------------------------------FINISH UP
 message = visual.TextStim(win,pos=(0,0), text='Your total earnings: $'+str(ttlrew)+'\n\nYou earned the $5 in real money!', color=[-1,-1,-1] ,colorSpace='rgb')
@@ -544,4 +687,3 @@ while 1:
 mouse.setVisible(1)
 win.close()
 core.quit()
-f.close()

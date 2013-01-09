@@ -291,6 +291,7 @@ person_types = dict(
 expData = []
 
 certainty = 15
+catch_magnitude = 10
 riskymagnitudes = [20,30,40,50,60]
 #sharedloss20 = [16,32,48]
 #sharedloss50 = [10,20,30]
@@ -369,6 +370,21 @@ for riskymagnitude in riskymagnitudes:
         trial['type'] = 'standard'
         expData.append(trial)
         
+for probability in probabilities:
+    trial = {}
+    trial['certainty'] = certainty
+    trial['riskmagnitude'] = catch_magnitude
+    trial['probability'] = probability
+    trial['sharedloss'] = -77
+    trial['matchedEVW'] = -77
+    trial['matchedEVL'] = -77
+    trial['rt'] = -77
+    trial['choice'] = -77
+    trial['outcome'] = -77
+    trial['ttlrew'] = -77
+    trial['type'] = 'catch'
+    expData.append(trial)
+
 for EVW in matchedEVW:
     for probability in probabilities:
         trial = {}

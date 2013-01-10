@@ -670,9 +670,7 @@ class RankingDlg(wx.Dialog):
 
 d = RankingDlg(nicknames,
     "Now sort these people according to how close you feel to them. Put the person to whom you feel closest at the top and the person from whom you feel most distant at the bottom. Click on a name to select it, then use the arrow keys to move it up and down the list.")
-while True:
-    if d.ShowModal() == wx.ID_OK:
-        break
+while d.ShowModal() != wx.ID_OK: pass
 distance_ranking = d.get_ranking()
 d.Destroy()
 

@@ -3,6 +3,7 @@
 from psychopy import *
 import wx
 import os
+import time
 import datetime
 import random, math, itertools
 import pickle
@@ -14,6 +15,15 @@ def concat(x):
 
 def shuffled(x):
     return random.sample(x, len(x))
+
+waitKey_delay = .02
+def waitKey(keyList = None):
+    event.clearEvents('keyboard')
+    while True:
+        keys = event.getKeys()
+        if keys and (keyList is None or keys[0] in keyList):
+            return keys[0]
+        time.sleep(waitKey_delay)
 
 def log(f, t):
     f.write('time:\t'+str(t['time']))
@@ -458,10 +468,10 @@ message = visual.TextStim(win,pos=(0.0,0.0), text='Experimenter, press any key t
 message.draw()
 win.flip()
 
-while not event.getKeys():
-    pass
+
+waitKey()
 win.flip()
-core.wait(5, hogCPUperiod = 5)
+time.sleep(5)
 
 #--------------------------------------------------RUN TASK
 timer = core.Clock()
@@ -475,9 +485,9 @@ win.flip()
 message = visual.TextStim(win,pos=(0.0,0.0), text='You have been assigned to be Player A.', color=-1., colorSpace='rgb')
 message.draw()
 win.flip()
-core.wait(5, hogCPUperiod = 5)
+time.sleep(5)
 win.flip()
-core.wait(2, hogCPUperiod = 2)
+time.sleep(2)
 win.flip()
 
 message = visual.TextStim(win,pos=(0.0,0.0), text='As Player A, there is another type of shared loss trial that you will see. In these trials, your losses would be shared with your local partner (Player B), but your local partner would see the loss as coming from the Duane Lab partner. On these trials, it will say "Shared Loss (as Duane Lab Partner) with Local Partner" underneath the risky reward option. Press the Spacebar when done reading.', color=-1., colorSpace='rgb')
@@ -485,10 +495,9 @@ message.draw()
 win.flip()
 
 event.clearEvents()
-while not event.getKeys():
-    pass
+waitKey()
 win.flip()
-core.wait(2, hogCPUperiod = 2)
+time.sleep(2)
 win.flip()
 
 
@@ -508,18 +517,11 @@ for trial in expData:
     win.flip()
     
     # wait for a choice
-    event.getKeys()
     timer.reset()
-    
-    choice = 0
-    rt = 0
+
     outcome = 0
-    event.clearEvents()
-    while choice == 0:
-        for key in event.getKeys():
-            if key in ['left', 'right']:
-                rt = timer.getTime()
-                choice = key
+    choice = waitKey(keyList = ['left', 'right'])
+    rt = timer.getTime()
                 
         # log response
     if sides:
@@ -542,16 +544,16 @@ for trial in expData:
     trial['outcome'] = outcome
     trial['ttlrew'] = ttlrew
     
-#    core.wait(2)
+#    time.sleep(2)
 #    win.flip()
-#    core.wait(2)
+#    time.sleep(2)
     
 # clear the screen
     win.flip()
 
 #    print(trial)
     log(logFile, trial)
-    core.wait(2, hogCPUperiod = 2)
+    time.sleep(2)
 
 # Unhide the mouse
 mouse.setVisible(True)
@@ -674,6 +676,7 @@ while True:
 distance_ranking = d.get_ranking()
 d.Destroy()
 
+print
 print >>logFile, json.dumps(dict(nicknames = nicknames, distance_ranking = distance_ranking))
 
 #--------------------------------------------------LOG RESULTS
@@ -690,15 +693,13 @@ with open(fileOut+'.pkl', 'wb') as f:
 message = visual.TextStim(win,pos=(0,0), text='Your total earnings: $'+str(ttlrew)+'\n\nYou earned the $5 in real money!', color=[-1,-1,-1] ,colorSpace='rgb')
 message.draw()
 win.flip()
-core.wait(5, hogCPUperiod = 5)
+time.sleep(5)
 win.flip()
 message = visual.TextStim(win,pos=(0,0), text='Done with task!\n\nPlease wait for the experimenter.', color=[-1,-1,-1] ,colorSpace='rgb')
 message.draw()
 win.flip()
-core.wait(5, hogCPUperiod = 5)
-while 1:
-    if event.getKeys():
-        break
+time.sleep(5)
+waitKey()
 
 mouse.setVisible(1)
 win.close()

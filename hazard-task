@@ -59,185 +59,30 @@ def drawtrial():
     message.setPos([0,.85])
     message.setText('Which would you prefer?')
     message.draw()
-    
-    if sides:
-        if trial['type'] == 'sharedlosslocal':
-            message.setPos(rewPos[0])
-            message.setText('100% Win ' +'$' + str(certainty))
-            message.draw()
-    
-            per = int(trial['probability']*100)
-            per2 = 100 - per
-            message.setPos(rewPos[1])
-            message.setText(str(per)+ '% Win ' + '$' + str(trial['riskmagnitude']))
-            message.draw()
-            message.setPos(riskPos[1])
-            message.setText(str(per2) + '% Lose ' + '$' + str(trial['riskmagnitude']))
-            message.draw()
-            message.setPos(riskpos3[1])
-            message.setText('Shared Loss with \nLocal Partner')
-            message.draw()
-            
-        elif trial['type'] == 'sharedlossDuane':
-            message.setPos(rewPos[0])
-            message.setText('100% Win ' +'$' + str(certainty))
-            message.draw()
-    
-            per = int(trial['probability']*100)
-            per2 = 100 - per
-            message.setPos(rewPos[1])
-            message.setText(str(per)+ '% Win ' + '$' + str(trial['riskmagnitude']))
-            message.draw()
-            message.setPos(riskPos[1])
-            message.setText(str(per2) + '% Lose ' + '$' + str(trial['riskmagnitude']))
-            message.draw()
-            message.setPos(riskpos3[1])
-            message.setText('Shared Loss with \nDuane Lab Partner')
-            message.draw()
-            
-        elif trial['type'] == 'sharedlossAsDuane':
-            message.setPos(rewPos[0])
-            message.setText('100% Win ' +'$' + str(certainty))
-            message.draw()
-    
-            per = int(trial['probability']*100)
-            per2 = 100 - per
-            message.setPos(rewPos[1])
-            message.setText(str(per)+ '% Win ' + '$' + str(trial['riskmagnitude']))
-            message.draw()
-            message.setPos(riskPos[1])
-            message.setText(str(per2) + '% Lose ' + '$' + str(trial['riskmagnitude']))
-            message.draw()
-            message.setPos(riskpos3[1])
-            message.setText('Shared Loss (as Duane Lab \npartner) with Local Partner')
-            message.draw()
-            
-        elif trial['type'] == 'matched':
-            message.setPos(rewPos[0])
-            message.setText('100% Win ' +'$' + str(certainty))
-            message.draw()
-            
-            per = int(trial['probability']*100)
-            per2 = 100 - per
-            EVW = trial['matchedEVW']
-            EVL = EVW/2
-            message.setPos(rewPos[1])
-            message.setText(str(per) + '% Win $'+str(EVW))
-            message.draw()
-            message.setPos(riskPos[1])
-            message.setText(str(per2)+'% Lose $'+str(EVL))
-            message.draw()
-            message.setPos(riskpos3[1])
-            message.setText('Full Personal Loss')
-            message.draw()
-                
-        else:
-            message.setPos(rewPos[0])
-            message.setText('100% Win ' +'$' + str(certainty))
-            message.draw()
-            
-            per = int(trial['probability']*100)
-            per2 = 100 - per
-            message.setPos(rewPos[1])
-            message.setText(str(per)+ '% Win ' + '$' + str(trial['riskmagnitude']))
-            message.draw()
-            message.setPos(riskPos[1])
-            message.setText(str(per2) + '% Lose ' + '$' + str(trial['riskmagnitude']))
-            message.draw()
-            message.setPos(riskpos3[1])
-            message.setText('Full Personal Loss')
-            message.draw()
-                
-    else:
-        if trial['type'] == 'sharedlosslocal':
-            per = int(trial['probability']*100)
-            per2 = 100 - per
-            message.setPos(rewPos[0])
-            message.setText(str(per)+ '% Win ' + '$' + str(trial['riskmagnitude']))
-            message.draw()
-            message.setPos(riskPos[0])
-            message.setText(str(per2) + '% Lose ' + '$' + str(trial['riskmagnitude']))
-            message.draw()
-            message.setPos(riskpos3[0])
-            message.setText('Shared Loss with \nLocal Partner')
-            message.draw()
 
-            message.setPos(rewPos[1])
-            message.setText('100% Win ' +'$' + str(certainty))
-            message.draw()
-            
-        elif trial['type'] == 'sharedlossDuane':
-            per = int(trial['probability']*100)
-            per2 = 100 - per
-            message.setPos(rewPos[0])
-            message.setText(str(per)+ '% Win ' + '$' + str(trial['riskmagnitude']))
-            message.draw()
-            message.setPos(riskPos[0])
-            message.setText(str(per2) + '% Lose ' + '$' + str(trial['riskmagnitude']))
-            message.draw()
-            message.setPos(riskpos3[0])
-            message.setText('Shared Loss with \nDuane Lab Partner')
-            message.draw()
+    message.setPos(rewPos[not sides])
+    message.setText('100% Win ' +'$' + str(certainty))
+    message.draw()
 
-            message.setPos(rewPos[1])
-            message.setText('100% Win ' +'$' + str(certainty))
-            message.draw()
-            
-        elif trial['type'] == 'sharedlossAsDuane':
-            per = int(trial['probability']*100)
-            per2 = 100 - per
-            message.setPos(rewPos[0])
-            message.setText(str(per)+ '% Win ' + '$' + str(trial['riskmagnitude']))
-            message.draw()
-            message.setPos(riskPos[0])
-            message.setText(str(per2) + '% Lose ' + '$' + str(trial['riskmagnitude']))
-            message.draw()
-            message.setPos(riskpos3[0])
-            message.setText('Shared Loss (as Duane Lab \nPartner) with Local Partner')
-            message.draw()
-
-            message.setPos(rewPos[1])
-            message.setText('100% Win ' +'$' + str(certainty))
-            message.draw()
-            
-            
-        elif trial['type'] == 'matched':
-            per = int(trial['probability']*100)
-            per2 = 100 - per
-            EVW = trial['matchedEVW']
-            EVL = EVW/2
-            message.setPos(rewPos[0])
-            message.setText(str(per) + '% Win $'+str(EVW))
-            message.draw()
-            message.setPos(riskPos[0])
-            message.setText(str(per2)+'% Lose $'+str(EVL))
-            message.draw()
-            message.setPos(riskpos3[0])
-            message.setText('Full Personal Loss')
-            message.draw()
-            
-            message.setPos(rewPos[1])
-            message.setText('100% Win ' +'$' + str(certainty))
-            message.draw()
-           
-            
-        else:
-            per = int(trial['probability']*100)
-            per2 = 100 - per
-            message.setPos(rewPos[0])
-            message.setText(str(per)+ '% Win ' + '$' + str(trial['riskmagnitude']))
-            message.draw()
-            message.setPos(riskPos[0])
-            message.setText(str(per2) + '% Lose ' + '$' + str(trial['riskmagnitude']))
-            message.draw()
-            message.setPos(riskpos3[0])
-            message.setText('Full Personal Loss')
-            message.draw()
-
-            message.setPos(rewPos[1])
-            message.setText('100% Win ' +'$' + str(certainty))
-            message.draw()
-
+    message.setPos(rewPos[sides])
+    message.setText('{}% Win ${}'.format(
+        int(trial['probability']*100),
+        trial['matchedEVW'] if trial['type'] == 'matched'
+            else trial['riskmagnitude']))
+    message.draw()
+    message.setPos(riskPos[sides])
+    message.setText('{}% Lose ${}'.format(
+        100 - int(trial['probability']*100),
+        trial['matchedEVL'] if trial['type'] == 'matched'
+            else trial['riskmagnitude']))
+    message.draw()
+    message.setPos(riskpos3[sides])
+    message.setText(
+        'Shared Loss with\nPlayer A' if trial['type'] == 'sharedlosslocal' else
+        'Shared Loss with\nPlayer B' if trial['type'] == 'sharedlossDuane' else
+        'Shared Loss (as Player B)\nwith Player A' if trial['type'] == 'sharedlossAsDuane' else
+        'Full Personal Loss')
+    message.draw()
 
 def drawoutcome(r):
     

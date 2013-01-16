@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 # encoding: UTF-8
 from psychopy import *
+import pyglet
 import wx
 import os
 import time
@@ -56,9 +57,11 @@ def log(f, t):
 
 
 def drawtrial():
-    message.setPos([0,.85])
-    message.setText('Which would you prefer?')
+    message.setPos([0,.75])
+    message.setHeight(.075)
+    message.setText(player_assignments)
     message.draw()
+    message.setHeight(.1)
 
     message.setPos(rewPos[not sides])
     message.setText('100% Win ' +'$' + str(certainty))
@@ -80,7 +83,7 @@ def drawtrial():
     message.setText(
         'Shared Loss with\nPlayer A' if trial['type'] == 'sharedlosslocal' else
         'Shared Loss with\nPlayer B' if trial['type'] == 'sharedlossDuane' else
-        'Shared Loss (as Player B)\nwith Player A' if trial['type'] == 'sharedlossAsDuane' else
+        'Shared Loss\n(as Player B)\nwith Player A' if trial['type'] == 'sharedlossAsDuane' else
         'Full Personal Loss')
     message.draw()
 
@@ -140,6 +143,10 @@ person_types = dict(
     unmet_classmate = "A classmate you can recognize but\nyou've never spoken to",
     dead_relative = "A relative who you know a least a little about but\nwho died before you were born",
     stranger = "A stranger you've seen once or a few times and\nwho you know nothing about")
+
+player_assignments = '''Player A: Your partner
+Player B: Participant at SUNY Buffalo
+Player C: You'''
 
 #--------------------------------------------------INITIALISE DATA STRUCTURE
 
@@ -289,9 +296,10 @@ logFile.flush()
 #--------------------------------------------------INITIALISE STIMULI
 
 # create a window to draw in
-res = [1280.,1024.]
-
-win=visual.Window(res,fullscr=1,bitsMode=None, units='norm', winType='pyglet', color=1., colorSpace='rgb')
+pyglet_screen = pyglet.window.get_platform().get_default_display().get_default_screen()
+win = visual.Window((pyglet_screen.width, pyglet_screen.height),
+    winType = 'pyglet', fullscr = False,
+    units = 'norm', color = 'white')
 
 y = .08
 rewPos = [(-.6, y), (.6, y)]
@@ -329,13 +337,7 @@ time.sleep(8.5)
 
 message = visual.TextStim(win,pos=(0.0,0.0), color=-1., colorSpace='rgb',
     wrapWidth = 1.5,
-    text='''Player assignments:
-
-Player A: Your partner
-Player B: Participant at SUNY Buffalo
-Player C: You
-
-Press the spacebar to continue.''')
+    text='Player assignments:\n\n' + player_assignments + '\n\nPress the spacebar to continue.')
 message.draw()
 win.flip()
 waitKey()
@@ -421,7 +423,6 @@ mouse.setVisible(True)
 def err(text):
     wx.MessageBox(text, 'Error')
 
-dialog_size = (800, 650)
 nickname_field_width = 200
 
 default_wrap_width = 300
@@ -433,8 +434,8 @@ def wrapped_text(parent, message, wrap_width = default_wrap_width):
 class NicknameInputDlg(wx.Dialog):
     def __init__(self, text):
         wx.Dialog.__init__(self, None,
-            title = 'My Cool Title',
-            size = dialog_size,
+            title = '',
+            size = (670, 550),
             style = wx.DEFAULT_DIALOG_STYLE & ~wx.CLOSE_BOX)
 
         p = wx.Panel(self)
@@ -453,7 +454,7 @@ class NicknameInputDlg(wx.Dialog):
             sizer.Add(x, flag = wx.ALIGN_CENTRE_VERTICAL)
         outer = wx.BoxSizer(wx.VERTICAL)
         outer.Add(wrapped_text(p, text, 650),
-            flag = wx.ALIGN_CENTRE | wx.TOP,
+            flag = wx.ALIGN_CENTRE | wx.ALL,
             border = 10)
         outer.Add(sizer, 1, wx.ALL | wx.EXPAND, 25)
         outer.Add(wx.Button(p, wx.ID_OK), flag = wx.ALIGN_CENTRE)
@@ -481,7 +482,7 @@ while True:
 class RankingDlg(wx.Dialog):
     def __init__(self, nicknames, text):
         wx.Dialog.__init__(self, None,
-            title = 'My Cool Title',
+            title = '',
             size = (default_wrap_width + 25, 600),
             style = wx.DEFAULT_DIALOG_STYLE & ~wx.CLOSE_BOX)
 
@@ -491,7 +492,7 @@ class RankingDlg(wx.Dialog):
         self.initial_nickname_order = shuffled(nicknames.values())
 
         self.lb = wx.ListBox(p,
-            #size = (200, 500),
+            size = (default_wrap_width, 400),
             choices = self.initial_nickname_order)
         self.lb.Bind(wx.EVT_KEY_DOWN, self.OnKeyDown, self.lb)
 
@@ -500,7 +501,7 @@ class RankingDlg(wx.Dialog):
         sz.Add(wrapped_text(p, text), flag = wx.ALIGN_CENTRE)
         sz.Add(self.lb, 1, flag = wx.EXPAND | wx.ALL, border = 10)
         sz.Add(wx.Button(p, wx.ID_OK), 0, flag = wx.ALIGN_CENTRE)
-        p.SetSizer(sz)
+        p.SetSizerAndFit(sz)
 
     def OnKeyDown(self, event):
         keycode = event.GetKeyCode()

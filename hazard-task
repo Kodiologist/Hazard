@@ -55,37 +55,31 @@ def log(f, t):
     f.write('\n')
     f.flush()
 
+def msg(x, y, text, height = .1, alignHoriz = 'center', alignVert = 'center'):
+    visual.TextStim(win, text = text,
+       pos = (x, y), color = 'black', height = height,
+       alignHoriz = alignHoriz, alignVert = alignVert).draw()
 
 def drawtrial():
-    message.setPos([0,.75])
-    message.setHeight(.075)
-    message.setText(player_assignments)
-    message.draw()
-    message.setHeight(.1)
+    msg(0, .75, player_assignments, height = .075)
 
-    message.setPos(rewPos[not sides])
-    message.setText('100% Win ' +'$' + str(certainty))
-    message.draw()
-
-    message.setPos(rewPos[sides])
-    message.setText('{}% Win ${}'.format(
+    msg(0, .35, alignVert = 'top', text =
+        '100% Win ${}\n\n\n\n{}% Win ${}\n{}% Lose ${}\n\n{}'.format(
+        certainty,
         int(trial['probability']*100),
         trial['matchedEVW'] if trial['type'] == 'matched'
-            else trial['riskmagnitude']))
-    message.draw()
-    message.setPos(riskPos[sides])
-    message.setText('{}% Lose ${}'.format(
+            else trial['riskmagnitude'],
         100 - int(trial['probability']*100),
         trial['matchedEVL'] if trial['type'] == 'matched'
-            else trial['riskmagnitude']))
-    message.draw()
-    message.setPos(riskpos3[sides])
-    message.setText(
+            else trial['riskmagnitude'],
+#    msg(0, -.5,
         'Shared Loss with\nPlayer A' if trial['type'] == 'sharedlosslocal' else
-        'Shared Loss with\nPlayer B' if trial['type'] == 'sharedlossDuane' else
-        'Shared Loss\n(as Player B)\nwith Player A' if trial['type'] == 'sharedlossAsDuane' else
-        'Full Personal Loss')
-    message.draw()
+            'Shared Loss with\nPlayer B' if trial['type'] == 'sharedlossDuane' else
+            'Shared Loss\n(as Player B)\nwith Player A' if trial['type'] == 'sharedlossAsDuane' else
+            'Full Personal Loss'))
+
+    visual.Rect(win, pos = (0, 0), width = 1, height = .01,
+        fillColor = 'black').draw()
 
 def drawoutcome(r):
     
@@ -301,17 +295,7 @@ win = visual.Window((pyglet_screen.width, pyglet_screen.height),
     winType = 'pyglet', fullscr = False,
     units = 'norm', color = 'white')
 
-y = .08
-rewPos = [(-.6, y), (.6, y)]
-w = -.65
-x = -.24
-z = -.08
-riskPos = [(-.6, z), (.6, z)]
-riskPos2 = [(-.6,x),(.6,x)]
-riskpos3 = [(-.6,w),(.6,w)]
-
 ttlrew = 0
-a = 0
 
 #--------------------------------------------------INSTRUCTIONS
 # clear the screen
@@ -360,16 +344,13 @@ win.flip()
 
 timer = core.Clock()
 
-for trial in expData:
+for tn, trial in enumerate(expData):
     
     trial['time'] = datetime.datetime.now()
     
-    a += 1
-    trial['trial'] = a
+    trial['trial'] = tn + 1
     
     win.flip()
-    
-    sides = random.random() > .5
     
     drawtrial()
     
@@ -379,20 +360,11 @@ for trial in expData:
     timer.reset()
 
     outcome = 0
-    choice = waitKey(keyList = ['left', 'right'])
+    choice = waitKey(keyList = ['up', 'down'])
     rt = timer.getTime()
                 
-        # log response
-    if sides:
-        if choice == 'right':
-            trial['choice'] = 1
-        else:
-            trial['choice'] = 0
-    else:
-        if choice == 'right':
-            trial['choice'] = 0
-        else:
-            trial['choice'] = 1
+    # log response
+    trial['choice'] = int(choice == 'down')
     trial['rt'] = rt
     
     win.flip()

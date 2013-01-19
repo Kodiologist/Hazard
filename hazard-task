@@ -321,7 +321,11 @@ time.sleep(8.5)
 
 message = visual.TextStim(win,pos=(0.0,0.0), color=-1., colorSpace='rgb',
     wrapWidth = 1.5,
-    text='Player assignments:\n\n' + player_assignments + '\n\nPress the spacebar to continue.')
+    text='\n\n'.join([
+        'Player assignments:',
+        player_assignments,
+        "Remember: as Player C, you can choose to share losses with Player A or Player B, but you cannot lose money because of other players' choices.",
+        'Press the spacebar to continue.']))
 message.draw()
 win.flip()
 waitKey()
@@ -329,7 +333,7 @@ time.sleep(.1)
 
 message = visual.TextStim(win,pos=(0.0,0.0), color=-1., colorSpace='rgb',
     wrapWidth = 1.5,
-    text='''As Player C, there is another type of shared-loss gamble that you will see, "Shared Loss (as Player B) with Player A". Losses from such gambles will be shared with Player A, but Player A will see the loss as coming from Player B, not from you.
+    text='''As Player C, there is also another type of shared-loss gamble that you will see, "Shared Loss (as Player B) with Player A". Losses from such gambles will be shared with Player A, but Player A will see the loss as coming from Player B, not from you.
 
 Press the spacebar to continue.''')
 message.draw()

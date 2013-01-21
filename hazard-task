@@ -55,15 +55,17 @@ def log(f, t):
     f.write('\n')
     f.flush()
 
-def msg(x, y, text, height = .1, alignHoriz = 'center', alignVert = 'center'):
+def msg(x, y, text, height = .1, alignHoriz = 'center', alignVert = 'center', wrapWidth = 1):
     visual.TextStim(win, text = text,
        pos = (x, y), color = 'black', height = height,
-       alignHoriz = alignHoriz, alignVert = alignVert).draw()
+       alignHoriz = alignHoriz, alignVert = alignVert,
+       wrapWidth = wrapWidth).draw()
 
 def drawtrial():
-    msg(0, .75, player_assignments, height = .075)
+    msg(0, .75, player_assignments, height = .075,
+      wrapWidth = 1.5)
 
-    msg(0, .35, alignVert = 'top', text =
+    msg(0, .275, alignVert = 'top', text =
         '100% Win ${}\n\n\n\n{}% Win ${}\n{}% Lose ${}\n\n{}'.format(
         certainty,
         int(trial['probability']*100),

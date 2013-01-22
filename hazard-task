@@ -27,32 +27,11 @@ def waitKey(keyList = None):
         time.sleep(waitKey_delay)
 
 def log(f, t):
-    f.write('time:\t'+str(t['time']))
-    f.write('\t')
-    f.write('trial:\t' +str(t['trial']))
-    f.write('\t')
-    f.write('trial type:\t' +str(t['type']))
-    f.write('\t')
-    f.write('certainty:\t'+str(t['certainty']))
-    f.write('\t')
-    f.write('riskmagnitude:\t'+str(t['riskmagnitude']))
-    f.write('\t')
-    f.write('probability:\t'+str(t['probability']))
-    f.write('\t')
-    f.write('sharedloss:\t'+str(t['sharedloss']))
-    f.write('\t')
-    f.write('matchedEVW:\t'+str(t['matchedEVW']))
-    f.write('\t')
-    f.write('matchedEVL:\t'+str(t['matchedEVL']))
-    f.write('\t')
-    f.write('rt:\t'+str(t['rt']))
-    f.write('\t')
-    f.write('choice:\t'+str(t['choice']))
-    f.write('\t')
-    f.write('outcome:\t'+str(t['outcome']))
-    f.write('\t')
-    f.write('ttlrew:\t'+str(t['ttlrew']))
-    f.write('\n')
+    print >>f, '\t'.join(['{}:\t{}'.format(k, t[k]) for k in (
+        'time', 'trial', 'type', 'certainty',
+        'riskmagnitude', 'probability', 'sharedloss',
+        'matchedEVW', 'matchedEVL', 'rt', 'choice',
+        'outcome', 'ttlrew')])
     f.flush()
 
 def msg(x, y, text, height = .1, alignHoriz = 'center', alignVert = 'center', wrapWidth = 1):
@@ -510,7 +489,7 @@ while d.ShowModal() != wx.ID_OK: pass
 distance_ranking = d.get_ranking()
 d.Destroy()
 
-print
+print >>logFile
 print >>logFile, json.dumps(dict(nicknames = nicknames, distance_ranking = distance_ranking))
 
 #--------------------------------------------------LOG RESULTS

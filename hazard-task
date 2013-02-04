@@ -305,7 +305,7 @@ message = visual.TextStim(win,pos=(0.0,0.0), color=-1., colorSpace='rgb',
     text='\n\n'.join([
         'Player assignments:',
         player_assignments,
-        "Remember: as Player C, you can choose to share losses with Player A or Player B, but you cannot lose money because of other players' choices.",
+        "Remember: as Player C, you can choose to share losses with Player A and Player B, but you cannot lose money because of other players' choices.",
         'Press the spacebar to continue.']))
 message.draw()
 win.flip()

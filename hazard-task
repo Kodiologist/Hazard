@@ -422,7 +422,7 @@ class NicknameInputDlg(wx.Dialog):
             for k, x in zip(self.person_types, self.fields)}
 
 d = NicknameInputDlg(
-    u"Below is a list of several types of people. Some of these types will include only one person for you, whereas others will include several. For each type, think of a particular person who fits the description. Then, in the blank, write a name we can use to refer to that person for this study. The name could be part of the person's actual name or it could be a short description—whatever is memorable enough that you won't forget what person the name refers to.")
+    u"""Below is a list of several types of people. Some of these types will include only one person for you, whereas others will include several. For each type, think of a particular person who fits the description. Then, in the blank, write a name we can use to refer to that person for this study. The name could be part of the person's actual name or it could be a short description—whatever is memorable enough that you won't forget what person the name refers to. (Hint: For people whose real names you don't know, a description will probably be more memorable than a made-up name.)""")
 #nicknames = {'remote_partner': u'duaney', 'unmet_classmate': u'class', 'best_friend': u'bff', 'parent': u'parent', 'doctor': u'doc', 'cashier': u'cashier', 'stranger': u'stranger', 'local_partner': u'thatguy', 'dead_relative': u'rel', 'childhood_friend': u'timmy', 'occ_relative': u'unclejoe', 'friend_of_friend': u'foaf'}
 while True:
     if d.ShowModal() != wx.ID_OK:

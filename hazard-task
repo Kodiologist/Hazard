@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 # encoding: UTF-8
+task = 'undeployed'
 from psychopy import *
 import pyglet
 import wx
@@ -490,7 +491,7 @@ distance_ranking = d.get_ranking()
 d.Destroy()
 
 print >>logFile
-print >>logFile, json.dumps(dict(nicknames = nicknames, distance_ranking = distance_ranking))
+print >>logFile, json.dumps(dict(task = task, nicknames = nicknames, distance_ranking = distance_ranking))
 
 #--------------------------------------------------LOG RESULTS
 
@@ -499,7 +500,7 @@ logFile.close()
 
 # pickle the data
 with open(fileOut+'.pkl', 'wb') as f:
-    pickle.dump(dict(expData = expData, nicknames = nicknames, distance_ranking = distance_ranking),
+    pickle.dump(dict(task = task, expData = expData, nicknames = nicknames, distance_ranking = distance_ranking),
         f)
 
 #--------------------------------------------------FINISH UP

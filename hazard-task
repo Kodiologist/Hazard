@@ -117,7 +117,7 @@ person_types = dict(
     cashier = "A cashier at a store (or a university eatery)\nthat you go to often",
     remote_partner = "Player B",
     unmet_classmate = "A classmate you can recognize but\nyou've never spoken to",
-    dead_relative = "A relative who you know a least a little about but\nwho died before you were born",
+    dead_relative = "A relative who you know at least a little about but\nwho died before you were born",
     stranger = "A stranger you've seen once or a few times and\nwho you know nothing about")
 
 player_assignments = '''Player A: Your partner

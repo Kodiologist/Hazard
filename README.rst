@@ -1,7 +1,20 @@
-This repository houses the task code for Hazard, an ongoing research project on moral hazard by me and Mike Bixter. Nothing else about Hazard has been published yet.
+This repository houses the task code and handouts for Hazard_, a research project on moral hazard by me and Mike Bixter.
 
-License
+.. _Hazard: http://arfer.net/projects/hazard
+
+Licenses
 ============================================================
+
+``hazard-task`` is licensed under the GNU GPL (see "GPL note" below). ``instructions.odt`` is copyright 2013 Michael Bixter and Kodi Arfer and licensed under a `Creative Commons Attribution-ShareAlike 3.0 United States License`_. ``RCIT.rst`` is a faithful reproduction (in reStructuredText) of the appendix of:
+
+    Sedikides, C., Campbell, W. K., Reeder, G. D., & Elliot, A. J. (1999). The relationship closeness induction task. *Representative Research in Social Psychology, 23*, 1–4. Retrieved from http://psychology.illinoisstate.edu/gdreeder/Publications/RCITarticle1999.pdf
+
+``RCIT.odt`` is a derivative work of ``RCIT.rst``.
+
+.. _`Creative Commons Attribution-ShareAlike 3.0 United States License`: http://creativecommons.org/licenses/by-sa/3.0/us/deed.en_US
+
+GPL note
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 This program is copyright 2013 Michael Bixter and Kodi Arfer.
 

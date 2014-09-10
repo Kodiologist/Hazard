@@ -31,7 +31,7 @@ def log(f, t):
     print >>f, '\t'.join(['{}:\t{}'.format(k, t[k]) for k in (
         'time', 'trial', 'type', 'certainty',
         'riskmagnitude', 'probability', 'sharedloss',
-        'matchedEVW', 'matchedEVL', 'rt', 'choice',
+        'rt', 'choice',
         'outcome', 'ttlrew')])
     f.flush()
 
@@ -49,11 +49,9 @@ def drawtrial():
         '100% Win ${}\n\n\n\n{}% Win ${}\n{}% Lose ${}\n\n{}'.format(
         certainty,
         int(trial['probability']*100),
-        trial['matchedEVW'] if trial['type'] == 'matched'
-            else trial['riskmagnitude'],
+        trial['riskmagnitude'],
         100 - int(trial['probability']*100),
-        trial['matchedEVL'] if trial['type'] == 'matched'
-            else trial['riskmagnitude'],
+        trial['riskmagnitude'],
 #    msg(0, -.5,
         'Shared Loss with\nPlayer A' if trial['type'] == 'sharedlosslocal' else
             'Full Personal Loss'))
@@ -73,13 +71,6 @@ def drawoutcome(r):
                 
             else:
                 rew = -trial['riskmagnitude']/2
-                
-        elif trial['type'] == 'matched':
-            if random.random() < trial['probability']:
-                rew = trial['matchedEVW']
-                
-            else:
-                rew = -trial['matchedEVW']/2
         
         else:
             if random.random() < trial['probability']:
@@ -102,8 +93,6 @@ catch_magnitude = 10
 riskymagnitudes = [20,30,40,50,60]
 #sharedloss20 = [16,32,48]
 #sharedloss50 = [10,20,30]
-#matchedrisky = [10,20,30,40,60]
-matchedEVW = [20,30,40,50,60]
 probabilities = [.5,.6,.7,.8]
 #percents = [50,60,70,80,90]
 #sharedlosses = [20,50]
@@ -118,8 +107,6 @@ for riskymagnitude in riskymagnitudes:
             trial['riskmagnitude'] = riskymagnitude
             trial['probability'] = probability
             trial['sharedloss'] = hazard
-            trial['matchedEVW'] = -77
-            trial['matchedEVL'] = -77
             trial['rt'] = -77 
             trial['choice'] = -77
             trial['outcome'] = -77
@@ -134,8 +121,6 @@ for riskymagnitude in riskymagnitudes:
         trial['riskmagnitude'] = riskymagnitude
         trial['probability'] = probability
         trial['sharedloss'] = -77
-        trial['matchedEVW'] = -77
-        trial['matchedEVL'] = -77
         trial['rt'] = -77 
         trial['choice'] = -77
         trial['outcome'] = -77
@@ -149,31 +134,12 @@ for probability in probabilities:
     trial['riskmagnitude'] = catch_magnitude
     trial['probability'] = probability
     trial['sharedloss'] = -77
-    trial['matchedEVW'] = -77
-    trial['matchedEVL'] = -77
     trial['rt'] = -77
     trial['choice'] = -77
     trial['outcome'] = -77
     trial['ttlrew'] = -77
     trial['type'] = 'catch'
     expData.append(trial)
-
-for EVW in matchedEVW:
-    for probability in probabilities:
-        trial = {}
-        trial['certainty'] = certainty
-        trial['riskmagnitude'] = -77
-        trial['probability'] = probability
-        trial['sharedloss'] = -77
-        trial['matchedEVW'] = EVW
-        trial['matchedEVL'] = EVW/2
-        trial['rt'] = -77 
-        trial['choice'] = -77
-        trial['outcome'] = -77
-        trial['ttlrew'] = -77
-        trial['type'] = 'matched'
-        expData.append(trial)
-        
         
 expData = misc.shuffleArray(expData)
 

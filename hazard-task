@@ -56,8 +56,6 @@ def drawtrial():
             else trial['riskmagnitude'],
 #    msg(0, -.5,
         'Shared Loss with\nPlayer A' if trial['type'] == 'sharedlosslocal' else
-            'Shared Loss with\nPlayer B' if trial['type'] == 'sharedlossDuane' else
-            'Shared Loss\n(as Player B)\nwith Player A' if trial['type'] == 'sharedlossAsDuane' else
             'Full Personal Loss'))
 
     visual.Rect(win, pos = (0, 0), width = 1, height = .01,
@@ -70,20 +68,6 @@ def drawoutcome(r):
         
     else:
         if trial['type'] == 'sharedlosseslocal':
-            if random.random() < trial['probability']:
-                rew = trial['riskmagnitude']
-                
-            else:
-                rew = -trial['riskmagnitude']/2
-                
-        elif trial['type'] == 'sharedlossesDuane':
-            if random.random() < trial['probability']:
-                rew = trial['riskmagnitude']
-                
-            else:
-                rew = -trial['riskmagnitude']/2
-                
-        elif trial['type'] == 'sharedlossesAsDuane':
             if random.random() < trial['probability']:
                 rew = trial['riskmagnitude']
                 
@@ -106,23 +90,8 @@ def drawoutcome(r):
                 
     return rew
 
-person_types = dict(
-    best_friend = "Your best friend",
-    parent = "The parent or stepparent you're closest to",
-    friend_of_friend = "A friend of a friend",
-    childhood_friend = "A childhood friend you haven't spoken to in years",
-    local_partner = "Player A",
-    occ_relative = "A relative you see no more than a few times a year",
-    doctor = "Your primary physician",
-    cashier = "A cashier at a store (or a university eatery)\nthat you go to often",
-    remote_partner = "Player B",
-    unmet_classmate = "A classmate you can recognize but\nyou've never spoken to",
-    dead_relative = "A relative who you know at least a little about but\nwho died before you were born",
-    stranger = "A stranger you've seen once or a few times and\nwho you know nothing about")
-
 player_assignments = '''Player A: Your partner
-Player B: Participant at SUNY Buffalo
-Player C: You'''
+Player B: You'''
 
 #--------------------------------------------------INITIALISE DATA STRUCTURE
 
@@ -156,40 +125,6 @@ for riskymagnitude in riskymagnitudes:
             trial['outcome'] = -77
             trial['ttlrew'] = -77
             trial['type'] = 'sharedlosslocal'
-            expData.append(trial)
-            
-for riskymagnitude in riskymagnitudes:
-    for probability in probabilities:
-        for hazard in sharedlosses:
-            trial = {}
-            trial['certainty'] = certainty
-            trial['riskmagnitude'] = riskymagnitude
-            trial['probability'] = probability
-            trial['sharedloss'] = hazard
-            trial['matchedEVW'] = -77
-            trial['matchedEVL'] = -77
-            trial['rt'] = -77 
-            trial['choice'] = -77
-            trial['outcome'] = -77
-            trial['ttlrew'] = -77
-            trial['type'] = 'sharedlossDuane'
-            expData.append(trial)
-            
-for riskymagnitude in riskymagnitudes:
-    for probability in probabilities:
-        for hazard in sharedlosses:
-            trial = {}
-            trial['certainty'] = certainty
-            trial['riskmagnitude'] = riskymagnitude
-            trial['probability'] = probability
-            trial['sharedloss'] = hazard
-            trial['matchedEVW'] = -77
-            trial['matchedEVL'] = -77
-            trial['rt'] = -77 
-            trial['choice'] = -77
-            trial['outcome'] = -77
-            trial['ttlrew'] = -77
-            trial['type'] = 'sharedlossAsDuane'
             expData.append(trial)
         
 for riskymagnitude in riskymagnitudes:
@@ -294,35 +229,23 @@ mouse.setVisible(False)
 waitKey()
 time.sleep(.2)
 
-message = visual.TextStim(win,pos=(0.0,0.0), color=-1., colorSpace='rgb',
-    text = 'Waiting for remote player...')
-message.draw()
-win.flip()
-time.sleep(8.5)
-
+reputation_condition = random.choice(['Anonymous', 'Visible'])
+reputation_message_start = 'As Player B, you will have the opportunity to take gambles that will make your partner less likely to win $5.'
+reputation_messages = dict(
+    Anonymous = 'Your partner will not be told what choices you made or whether you affected their chances of winning $5.',
+    Visible = 'After the task is complete, your partner will see a complete list of the choices you made and how you affected their chances of winning $5. The two of you will then have the opportunity to discuss your choices.')
 
 message = visual.TextStim(win,pos=(0.0,0.0), color=-1., colorSpace='rgb',
     wrapWidth = 1.5,
     text='\n\n'.join([
         'Player assignments:',
         player_assignments,
-        "Remember: as Player C, you can choose to share losses with Player A and Player B, but you cannot lose money because of other players' choices.",
+        reputation_message_start + ' ' + reputation_messages[reputation_condition],
         'Press the spacebar to continue.']))
 message.draw()
 win.flip()
 waitKey()
-time.sleep(.1)
 
-message = visual.TextStim(win,pos=(0.0,0.0), color=-1., colorSpace='rgb',
-    wrapWidth = 1.5,
-    text='''As Player C, there is also another type of shared-loss gamble that you will see, "Shared Loss (as Player B) with Player A". Losses from such gambles will be shared with Player A, but Player A will see the loss as coming from Player B, not from you.
-
-Press the spacebar to continue.''')
-message.draw()
-win.flip()
-
-waitKey()
-win.flip()
 time.sleep(2)
 win.flip()
 
@@ -372,135 +295,17 @@ for tn, trial in enumerate(expData):
     log(logFile, trial)
     time.sleep(2)
 
-# Unhide the mouse
-mouse.setVisible(True)
-
-
-#--------------------------------------------------ADMINISTER MANIPULATION CHECK
-
-def err(text):
-    wx.MessageBox(text, 'Error')
-
-nickname_field_width = 200
-
-default_wrap_width = 300
-def wrapped_text(parent, message, wrap_width = default_wrap_width):
-    x = wx.StaticText(parent, label = message)
-    x.Wrap(wrap_width)
-    return x
-
-class NicknameInputDlg(wx.Dialog):
-    def __init__(self, text):
-        wx.Dialog.__init__(self, None,
-            title = '',
-            size = (670, 550),
-            style = wx.DEFAULT_DIALOG_STYLE & ~wx.CLOSE_BOX)
-
-        p = wx.Panel(self)
-
-        self.person_types = shuffled(person_types.keys())
-        self.labels = []
-        self.fields = []
-        for pt in self.person_types:
-            self.labels.append(wx.StaticText(p, -1, person_types[pt]))
-            self.fields.append(wx.TextCtrl(p, -1, size = (nickname_field_width, -1)))
-
-        space = 5
-
-        sizer = wx.FlexGridSizer(cols = 2, hgap=space, vgap=space)
-        for x in concat(zip(self.labels, self.fields)):
-            sizer.Add(x, flag = wx.ALIGN_CENTRE_VERTICAL)
-        outer = wx.BoxSizer(wx.VERTICAL)
-        outer.Add(wrapped_text(p, text, 650),
-            flag = wx.ALIGN_CENTRE | wx.ALL,
-            border = 10)
-        outer.Add(sizer, 1, wx.ALL | wx.EXPAND, 25)
-        outer.Add(wx.Button(p, wx.ID_OK), flag = wx.ALIGN_CENTRE)
-        p.SetSizerAndFit(outer)
-
-    def get_nicknames(self):
-        return {k: x.GetValue().strip()
-            for k, x in zip(self.person_types, self.fields)}
-
-d = NicknameInputDlg(
-    u"""Below is a list of several types of people. Some of these types will include only one person for you, whereas others will include several. For each type, think of a particular person who fits the description. Then, in the blank, write a name we can use to refer to that person for this study. The name could be part of the person's actual name or it could be a short description—whatever is memorable enough that you won't forget what person the name refers to. (Hint: For people whose real names you don't know, a description will probably be more memorable than a made-up name.)""")
-#nicknames = {'remote_partner': u'duaney', 'unmet_classmate': u'class', 'best_friend': u'bff', 'parent': u'parent', 'doctor': u'doc', 'cashier': u'cashier', 'stranger': u'stranger', 'local_partner': u'thatguy', 'dead_relative': u'rel', 'childhood_friend': u'timmy', 'occ_relative': u'unclejoe', 'friend_of_friend': u'foaf'}
-while True:
-    if d.ShowModal() != wx.ID_OK:
-        continue
-    nicknames = d.get_nicknames()
-    if any(s == "" for s in nicknames.values()):
-        err('Please provide a name for every type of person.')
-    elif len(set(nicknames.values())) != len(nicknames):
-        err('No two names can be identical.')
-    else:
-        d.Destroy()
-        break
-
-class RankingDlg(wx.Dialog):
-    def __init__(self, nicknames, text):
-        wx.Dialog.__init__(self, None,
-            title = '',
-            size = (default_wrap_width + 25, 600),
-            style = wx.DEFAULT_DIALOG_STYLE & ~wx.CLOSE_BOX)
-
-        p = wx.Panel(self)
-
-        self.nicknames = nicknames
-        self.initial_nickname_order = shuffled(nicknames.values())
-
-        self.lb = wx.ListBox(p,
-            size = (default_wrap_width, 400),
-            choices = self.initial_nickname_order)
-        self.lb.Bind(wx.EVT_KEY_DOWN, self.OnKeyDown, self.lb)
-
-        sz = wx.BoxSizer(wx.VERTICAL)
-        sz.Add((0, 10))
-        sz.Add(wrapped_text(p, text), flag = wx.ALIGN_CENTRE)
-        sz.Add(self.lb, 1, flag = wx.EXPAND | wx.ALL, border = 10)
-        sz.Add(wx.Button(p, wx.ID_OK), 0, flag = wx.ALIGN_CENTRE)
-        p.SetSizerAndFit(sz)
-
-    def OnKeyDown(self, event):
-        keycode = event.GetKeyCode()
-        if keycode == wx.WXK_UP:
-            incr = -1
-        elif keycode == wx.WXK_DOWN:
-            incr = 1
-        else:
-            event.Skip()
-            return
-        # Move the selected item up or down the list.
-        lb = event.GetEventObject()
-        i = lb.GetSelection()
-        if i + incr in (-1, lb.GetCount()):
-          # The user is trying to go past the end of the list.
-            return
-        strs = lb.GetStrings()
-        lb.Delete(i + incr)
-        lb.Insert(strs[i + incr], i)
-
-    def get_ranking(self):
-        rnicknames = {v: k for k, v in self.nicknames.items()}
-        return [rnicknames[k] for k in self.lb.GetStrings()]
-
-d = RankingDlg(nicknames,
-    "Now sort these people according to how close you feel to them. Put the person to whom you feel closest at the top and the person from whom you feel most distant at the bottom. Click on a name to select it, then use the arrow keys to move it up and down the list.")
-while d.ShowModal() != wx.ID_OK: pass
-distance_ranking = d.get_ranking()
-d.Destroy()
+#--------------------------------------------------LOG RESULTS
 
 print >>logFile
-print >>logFile, json.dumps(dict(task = task, nicknames = nicknames, distance_ranking = distance_ranking))
-
-#--------------------------------------------------LOG RESULTS
+print >>logFile, json.dumps(dict(task = task, reputation_condition = reputation_condition))
 
 # clean up the log file
 logFile.close()
 
 # pickle the data
 with open(fileOut+'.pkl', 'wb') as f:
-    pickle.dump(dict(task = task, expData = expData, nicknames = nicknames, distance_ranking = distance_ranking),
+    pickle.dump(dict(task = task, expData = expData, reputation_condition = reputation_condition),
         f)
 
 #--------------------------------------------------FINISH UP

@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 # encoding: UTF-8
 task = 'undeployed'
+cas = []
 from psychopy import *
 import pyglet
 import wx
@@ -195,7 +196,9 @@ mouse.setVisible(False)
 waitKey()
 time.sleep(.2)
 
-reputation_condition = random.choice(['Anonymous', 'Visible'])
+reputation_condition = ['Anonymous', 'Visible'][cas[SN]
+    if SN >= 0 and SN < len(cas)
+    else random.choice([0, 1])]
 reputation_message_start = 'As Player B, you will have the opportunity to take gambles that could benefit you but could also make your partner less likely to win $5.'
 reputation_messages = dict(
     Anonymous = 'Your partner will not be told what choices you made or whether you affected their chances of winning $5.',
